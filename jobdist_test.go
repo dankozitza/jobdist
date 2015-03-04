@@ -8,49 +8,47 @@ import (
 
 var (
 	test_template interface{} = map[string]interface{}{
-		"str": "",
-		"num": 0}
+		"str": string(""),
+		"num": int64(0),
+		"links": []interface{}{
+			&map[string]interface{}{
+				"href": "/test_jobdist",
+				"rel":  "index"}}}
 	test_input interface{} = map[string]interface{}{
 		"str": "test string in test input",
-		"num": 7}
-
-	//testJob Job = New(test_template, test_input, test_worker)
+		"num": int64(118988823)}
 )
 
 type test_worker struct{}
 
 func (tw test_worker) Work(result *map[string]interface{}) error {
 	res := *result
-	//res["response"] = res["str"].(string) + ":" + fmt.Sprint(res["num"])
-	res["response"] = 1
+	res["response"] = map[string]interface{}{
+		"count": int64(0),
+		"msg":   res["str"].(string)}
+
 	for {
-		res["response"] = res["response"].(int) + 1
-		if res["response"].(int) >= 41898882 {
+		res2 := res["response"].(map[string]interface{})
+		res2["count"] = res2["count"].(int64) + 1
+		if res2["count"].(int64) >= res["num"].(int64) {
 			break
 		}
 	}
-	//tw.Status = "finished"
 	return nil
 }
 
 func TestAll(t *testing.T) {
 
-	for i := 0; i < 5; i++ {
-		var myworker test_worker
+	var myworker test_worker
 
-		myjob := New(test_template, test_input, myworker)
+	myjob := New(test_template, test_input, myworker)
 
-		if !myjob.Satisfies_Template() {
-			reply := myjob.New_Form()
-			fmt.Println("input does not satisfy template")
-			fmt.Println("new_form: ", reply)
-		} else {
-			fmt.Println("input satisfies template")
-			//myjob.worker = myjob.input.(map[string]interface{})
-			redir_loc := myjob.Create_Redirect()
-			fmt.Println("you are being redirected to:", redir_loc)
-		}
-	}
+	reply := myjob.New_Form()
+	fmt.Println("new_form:[", reply, "]")
+
+	// normally would only do this if Satisfies_Template() returns true
+	redir_loc := myjob.Create_Redirect()
+	fmt.Println("redirect:[", redir_loc, "]")
 
 	http.ListenAndServe("localhost:9000", nil)
 }
