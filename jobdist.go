@@ -82,7 +82,7 @@ func (j *Job) Satisfies_Template() bool {
 
 // New_Form()
 //
-//	When the template is not satisfied by the input parameter reply with this
+// When the template is not satisfied by the input parameter reply with this
 // form generated from the template.
 //
 func (j *Job) New_Form() interface{} {
@@ -128,6 +128,7 @@ func (j *Job) Create_Redirect() string {
 	// create the response map
 	(*j.Response)["response"] = new(map[string]interface{})
 
+	// TODO: handle error returned by do_work
 	go j.do_work()
 
 	return redir_href
@@ -139,10 +140,10 @@ func (j *Job) Create_Redirect() string {
 //
 func (j *Job) do_work() error {
 
-	(*j.worker).Work(j.Response)
+	err := (*j.worker).Work(j.Response)
 	*j.Status = "finished"
 
-	return nil
+	return err
 }
 
 // JobHTTPHandler
