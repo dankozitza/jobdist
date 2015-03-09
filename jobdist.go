@@ -3,9 +3,9 @@ package jobdist
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/dankozitza/dkutils"
 	"github.com/dankozitza/sconf"
 	"github.com/dankozitza/stattrack"
-	//"github.com/dankozitza/dkutils"
 	"net/http"
 )
 
@@ -71,13 +71,17 @@ func New(template interface{}, input interface{}, worker Worker) *Job {
 // worker and could cause a panic in the Work() function.
 //
 func (j *Job) Satisfies_Template() bool {
-	// TODO: build DeepPersuadeType
-	//result, err := dkutils.DeepPersuadeType(j.Template, j.Input)
-	//if err == nil {
-	//	//j.Input = result
-	return true
-	//}
-	//return false
+
+	// here i could copy the links array from the template to the input
+	// so that dkutils.DeepTypeCheck would not need to
+
+	result, err := dkutils.DeepTypePersuade(j.Template, j.Input)
+	if err == nil {
+		j.Input = result
+		return true
+	}
+	fmt.Println("Satisfies_Template: got error: " + err.Error())
+	return false
 }
 
 // New_Form()
