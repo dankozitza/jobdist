@@ -80,7 +80,7 @@ func (j *Job) Satisfies_Template() bool {
 		j.Input = result
 		return true
 	}
-	fmt.Println("Satisfies_Template: got error: " + err.Error())
+	stat.Warn("Satisfies_Template: got error: " + err.Error())
 	return false
 }
 
